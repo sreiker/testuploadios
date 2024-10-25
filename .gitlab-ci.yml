@@ -1,0 +1,24 @@
+# Define stages
+stages:
+  - publish
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  IPA_FILE_NAME: "VaroCruise.ipa"
+  IPA_FILE_PATH: "/path/to/your/local/$IPA_FILE_NAME" # Update with your local IPA path
+
+# Upload ipa to Lambdatest
+iOS-lambdatest:
+  stage: publish
+  tags:
+    - code-artifact-node-20  # Update or remove if needed
+  timeout: 30m
+  allow_failure: true
+  script:
+    - |
+      curl -u "CruiseBot:$LAMBDATEST_TOKEN" \
+      -X POST "https://manual-api.lambdatest.com/app/upload/realDevice" \
+      -F "appFile=@${IPA_FILE_PATH}" \
+      -F "name=$IPA_FILE_NAME_${CI_PIPELINE_ID}" \
+      -F "custom_id=varo.uat.ios" \
+      -F "visibility=team" --verbose
